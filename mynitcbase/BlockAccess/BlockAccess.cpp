@@ -2,6 +2,8 @@
 #include "BlockAccess.h"
 #include <stdlib.h>
 #include <cstring>
+#include <iostream>
+using namespace std;
 RecId BlockAccess::linearSearch(int relId, char attrName[ATTR_SIZE], union Attribute attrVal, int op) {
     // get the previous search index of the relation relId from the relation cache
     // (use RelCacheTable::getSearchIndex() function)
@@ -199,21 +201,22 @@ int BlockAccess::renameAttribute(char relName[ATTR_SIZE], char oldName[ATTR_SIZE
     Attribute relNameAttr;    // set relNameAttr to relName
     strcpy(relNameAttr.sVal,relName);
     char name[ATTR_SIZE];
-    strcpy(name,ATTRCAT_RELNAME);
+    strcpy(name,ATTRCAT_ATTR_RELNAME);
     RecId recId = BlockAccess::linearSearch(RELCAT_RELID,name,relNameAttr,EQ);
     if(recId.block == -1 && recId.slot == -1)return E_RELNOTEXIST;
     // Search for the relation with name relName in relation catalog using linearSearch()
     // If relation with name relName does not exist (search returns {-1,-1})
     //    return E_RELNOTEXIST;
-    RelCacheTable::resetSearchIndex(ATTRCAT_RELID);
     /* reset the searchIndex of the attribute catalog using
        RelCacheTable::resetSearchIndex() */
     
     /* declare variable attrToRenameRecId used to store the attr-cat recId
     of the attribute to rename */
-    RecId attrToRenameRecId{-1, -1};
     Attribute attrCatEntryRecord[ATTRCAT_NO_ATTRS];
-
+    RecId attrToRenameRecId{-1, -1};
+    AttrCacheEntry attr;
+    RelCacheTable::resetSearchIndex(ATTRCAT_RELID);
+    // AttrCacheTable::getAttrCatEntry(recId,)
     /* iterate over all Attribute Catalog Entry record corresponding to the
        relation to find the required attribute */
     while (true) {
@@ -231,9 +234,8 @@ int BlockAccess::renameAttribute(char relName[ATTR_SIZE], char oldName[ATTR_SIZE
         {
             attrToRenameRecId.block = recId.block;
             attrToRenameRecId.slot = recId.slot;
-            break;
         }
-        if(!strcmp(attrCatEntryRecord[ATTRCAT_ATTR_NAME_INDEX].sVal,newName))
+        if(!strcmp(attrCatEntryRecord[1].sVal,newName))
         {
             return E_ATTREXIST;
         }
