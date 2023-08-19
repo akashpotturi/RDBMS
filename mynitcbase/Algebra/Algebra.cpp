@@ -101,9 +101,6 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
         // get the attrCatEntry for the srcRelId with corresponding offsets
         AttrCatEntry attrCatEntry;
         AttrCacheTable::getAttrCatEntry(srcRelId, i, &attrCatEntry);
-
-        // with the attrCatEntry we can get the attrType
-        // print correspondingly
         if (attrCatEntry.attrType == STRING)
           printf(" %s |", record[i].sVal);
         else
