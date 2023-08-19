@@ -10,6 +10,9 @@ int main(int argc, char *argv[]) {
   Disk disk_run;
   StaticBuffer buffer;
   OpenRelTable cache;
+  int count;
+  for(int i = 0;i<6;i++)count++;
+  std::cout<<"hello"<<std::endl;
 
   return FrontendInterface::handleFrontend(argc, argv);
 }
