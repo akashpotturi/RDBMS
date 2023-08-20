@@ -386,6 +386,14 @@ OpenRelTable::OpenRelTable() {
   RelCacheTable::relCache[ATTRCAT_RELID] = (struct RelCacheEntry*)malloc(sizeof(RelCacheEntry));
   *(RelCacheTable::relCache[ATTRCAT_RELID]) = relCacheEntry;
 
+  //exercise
+  relCatBlock.getRecord(relCatRecord,2);
+  RelCacheTable::recordToRelCatEntry(relCatRecord,&relCacheEntry.relCatEntry);
+  relCacheEntry.recId.block = RELCAT_BLOCK;
+  relCacheEntry.recId.slot = 2;
+  RelCacheTable::relCache[2] = (struct RelCacheEntry*)malloc(sizeof(RelCacheEntry));
+  *(RelCacheTable::relCache[2]) = relCacheEntry;
+
   // set up the relation cache entry for the attribute catalog similarly
   // from the record at RELCAT_SLOTNUM_FOR_ATTRCAT
 
@@ -450,13 +458,38 @@ OpenRelTable::OpenRelTable() {
   // set up the attributes of the attribute cache similarly.
   // read slots 6-11 from attrCatBlock and initialise recId appropriately
   AttrCacheTable::attrCache[ATTRCAT_RELID] = /* head of the linked list */head;
-  // set the value at AttrCacheTable::attrCache[ATTRCAT_RELID
+  // set the value at AttrCacheTable::attrCache[ATTRCAT_RELID]
+
+  head = NULL;
+
+  /**** setting up Attribute Catalog relation in the Attribute Cache Table ****/
+  head = temp = (AttrCacheEntry*) malloc (sizeof(AttrCacheEntry));
+  int n = RelCacheTable::relCache[2]->relCatEntry.numAttrs;
+  for(int i = 0;i<n;i++)
+  {
+    temp->next = (AttrCacheEntry*) malloc (sizeof(AttrCacheEntry));
+    temp = temp->next;
+  }
+  temp->next = NULL;
+  temp = head;
+  for(int i = 12;i<12+n;i++)
+  {
+    attrCatBlock.getRecord(attrCatRecord,i);
+    AttrCacheTable::recordToAttrCatEntry(attrCatRecord,&temp->attrCatEntry);
+    temp->recId.block = ATTRCAT_BLOCK;
+    temp->recId.slot = i;
+    temp = temp->next;
+  }
+  // set up the attributes of the attribute cache similarly.
+  // read slots 6-11 from attrCatBlock and initialise recId appropriately
+  AttrCacheTable::attrCache[2] = /* head of the linked list */head;
 }
 int OpenRelTable::getRelId(char relName[ATTR_SIZE]) {
 
   // if relname is RELCAT_RELNAME, return RELCAT_RELID
   if(!strcmp(relName,RELCAT_RELNAME))return RELCAT_RELID;
   if(!strcmp(relName, ATTRCAT_RELNAME))return ATTRCAT_RELID;
+  if(!strcmp(relName,"Students"))return 2;
   // if relname is ATTRCAT_RELNAME, return ATTRCAT_RELID
 
   return E_RELNOTOPEN;

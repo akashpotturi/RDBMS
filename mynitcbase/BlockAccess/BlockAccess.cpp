@@ -86,7 +86,7 @@ RecId BlockAccess::linearSearch(int relId, char attrName[ATTR_SIZE], union Attri
            current record */
         Attribute attr2 = record[buf.offset];
 
-        int cmpVal = compareAttrs(attrVal,attr2,buf.attrType);  // will store the difference between the attributes
+        int cmpVal = compareAttrs(attr2, attrVal, buf.attrType);  // will store the difference between the attributes
         // set cmpVal using compareAttrs()
 
         /* Next task is to check whether this record satisfies the given condition.
@@ -111,7 +111,7 @@ RecId BlockAccess::linearSearch(int relId, char attrName[ATTR_SIZE], union Attri
             rec.block = block;
             rec.slot = slot;
             RelCacheTable::setSearchIndex(relId,&rec);
-            return RecId{block, slot};
+            return rec;
         }
 
         slot++;
