@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 // the declarations for these functions can be found in "BlockBuffer.h"
 
 BlockBuffer::BlockBuffer(int blockNum) {
@@ -28,10 +29,67 @@ int BlockBuffer::getHeader(struct HeadInfo *head) {
   memcpy(&head->numEntries, buffer+16 , 4);
   memcpy(&head->numAttrs, buffer+20, 4);
   memcpy(&head->numSlots, buffer + 24, 4);
-
   return SUCCESS;
 }
+int BlockBuffer::setHeader(struct HeadInfo *head){
 
+    unsigned char *bufferPtr;
+    // get the starting address of the buffer containing the block using
+    // loadBlockAndGetBufferPtr(&bufferPtr).
+    int ret = loadBlockAndGetBufferPtr(&bufferPtr);
+    if (ret != SUCCESS) {
+      return ret;   // return any errors that might have occured in the process
+    }
+    // if loadBlockAndGetBufferPtr(&bufferPtr) != SUCCESS
+        // return the value returned by the call.
+
+    // cast bufferPtr to type HeadInfo*
+    struct HeadInfo *bufferHeader = (struct HeadInfo *)bufferPtr;
+    bufferHeader->blockType = head->blockType;
+    bufferHeader->lblock = head->lblock;
+    bufferHeader->numAttrs = head->numAttrs;
+    bufferHeader->numEntries = head->numEntries;
+    bufferHeader->numSlots = head->numSlots;
+    bufferHeader->pblock = head->pblock;
+    bufferHeader->rblock = head->rblock;
+
+    // copy the fields of the HeadInfo pointed to by head (except reserved) to
+    // the header of the block (pointed to by bufferHeader)
+    //(hint: bufferHeader->numSlots = head->numSlots )
+
+    // update dirty bit by calling StaticBuffer::setDirtyBit()
+    // if setDirtyBit() failed, return the error code
+    ret = StaticBuffer::setDirtyBit(this->blockNum);
+    if(ret!=SUCCESS)return ret;
+    return SUCCESS;
+
+    // return SUCCESS;
+}
+int BlockBuffer::setBlockType(int blockType){
+
+    unsigned char *bufferPtr;
+    /* get the starting address of the buffer containing the block
+       using loadBlockAndGetBufferPtr(&bufferPtr). */
+
+    // if loadBlockAndGetBufferPtr(&bufferPtr) != SUCCESS
+        // return the value returned by the call.
+    int ret = loadBlockAndGetBufferPtr(&bufferPtr);
+    if (ret != SUCCESS) {
+      return ret;   // return any errors that might have occured in the process
+    }
+    // store the input block type in the first 4 bytes of the buffer.
+    // (hint: cast bufferPtr to int32_t* and then assign it)
+    *((int32_t *)bufferPtr) = blockType;
+
+    // update the StaticBuffer::blockAllocMap entry corresponding to the
+    // object's block number to `blockType`.
+
+    // update dirty bit by calling StaticBuffer::setDirtyBit()
+    // if setDirtyBit() failed
+        // return the returned value from the call
+
+    // return SUCCESS
+}
 // load the record at slotNum into the argument pointer
 int RecBuffer::getRecord(union Attribute* rec, int slotNum) {
 
@@ -63,25 +121,6 @@ int RecBuffer::getRecord(union Attribute* rec, int slotNum) {
   return SUCCESS;
 }
 
-// int BlockBuffer::loadBlockAndGetBufferPtr(unsigned char **buffPtr) {
-//   // check whether the block is already present in the buffer using StaticBuffer.getBufferNum()
-//   int bufferNum = StaticBuffer::getBufferNum(this->blockNum);
-
-//   if (bufferNum == E_BLOCKNOTINBUFFER) {
-//     bufferNum = StaticBuffer::getFreeBuffer(this->blockNum);
-
-//     if (bufferNum == E_OUTOFBOUND) {
-//       return E_OUTOFBOUND;
-//     }
-
-//     Disk::readBlock(StaticBuffer::blocks[bufferNum], this->blockNum);
-//   }
-
-//   // store the pointer to this buffer (blocks[bufferNum]) in *buffPtr
-//   *buffPtr = StaticBuffer::blocks[bufferNum];
-
-//   return SUCCESS;
-// }
 
 /* NOTE: This function will NOT check if the block has been initialised as a
    record or an index block. It will copy whatever content is there in that
