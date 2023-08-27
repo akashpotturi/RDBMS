@@ -9,18 +9,10 @@ unsigned char StaticBuffer::blockAllocMap[DISK_BLOCKS];
 StaticBuffer::StaticBuffer() {
 
   // initialise all blocks as free
-  Disk::readBlock(blocks[0],0);
-  Disk::readBlock(blocks[1],1);
-  Disk::readBlock(blocks[2],2);
-  Disk::readBlock(blocks[3],3);
-  int k = 0;
-  for(int i = 0;i<4;i++)
-  {
-    for(int j = 0;j<BLOCK_SIZE;j++)
-    {
-      blockAllocMap[k++] = blocks[i][j];
-    }
-  }
+ for(int i = 0;i<BLOCK_ALLOCATION_MAP_SIZE;i++)
+ {
+  Disk::readBlock(blockAllocMap+i*BLOCK_SIZE,i);
+ }
   for (/*bufferIndex = 0 to BUFFER_CAPACITY-1*/int bufferIndex = 0;bufferIndex<BUFFER_CAPACITY;bufferIndex++) {
     metainfo[bufferIndex].free = true;
     metainfo[bufferIndex].dirty = false;
@@ -141,15 +133,9 @@ StaticBuffer::~StaticBuffer() {
     write back blocks with metainfo as free=false,dirty=true
     using Disk::writeBlock()
     */
-  unsigned char buffer[BLOCK_SIZE];
-  int k = 0;
-  for(int i = 0;i<4;i++)
+  for(int i = 0;i<BLOCK_ALLOCATION_MAP_SIZE;i++)
   {
-    for(int j = 0;j<BLOCK_SIZE;j++)
-    {
-      buffer[j] = blockAllocMap[k++];
-    }
-    Disk::writeBlock(buffer,i);
+    Disk::writeBlock(blockAllocMap+i*BLOCK_SIZE,i);
   }
   for(int i = 0;i<BUFFER_CAPACITY;i++)
   {

@@ -3,16 +3,6 @@
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
-// int OpenRelTable::getRelId(char relName[ATTR_SIZE]) {
-
-//   // if relname is RELCAT_RELNAME, return RELCAT_RELID
-//   if(!strcmp(relName,RELCAT_RELNAME))return RELCAT_RELID;
-//   if(!strcmp(relName, ATTRCAT_RELNAME))return ATTRCAT_RELID;
-
-//   // if relname is ATTRCAT_RELNAME, return ATTRCAT_RELID
-
-//   return E_RELNOTOPEN;
-// }
 
 OpenRelTableMetaInfo OpenRelTable::tableMetaInfo[MAX_OPEN];
 
@@ -245,7 +235,22 @@ int OpenRelTable::closeRel(int relId) {
   if (/* rel-id corresponds to a free slot*/tableMetaInfo[relId].free) {
     return E_RELNOTOPEN;
   }
+  if (/* RelCatEntry of the relId-th Relation Cache entry has been modified */RelCacheTable::relCache[relId]->dirty)
+  {
+    RelCatEntry buffer;
+    RelCacheTable::getRelCatEntry(relId,&buffer);
+    /* Get the Relation Catalog entry from RelCacheTable::relCache
+    Then convert it to a record using RelCacheTable::relCatEntryToRecord(). */
+    Attribute record[RELCAT_NO_ATTRS];
+    RelCacheTable::relCatEntryToRecord(&buffer,record);
+    RecId recId = RelCacheTable::relCache[relId]->recId;
 
+    // declaring an object of RecBuffer class to write back to the buffer
+    RecBuffer relCatBlock(recId.block);
+    relCatBlock.setRecord(record,recId.slot);
+
+    // Write back to the buffer using relCatBlock.setRecord() with recId.slot
+  }
   // free the memory allocated in the relation and attribute caches which was
   // allocated in the OpenRelTable::openRel() function
   free(RelCacheTable::relCache[relId]);
