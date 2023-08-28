@@ -152,7 +152,7 @@ int Schema::createRel(char relName[],int nAttrs, char attrs[][ATTR_SIZE],int att
         // fill attrCatRecord fields as given below
         strcpy(attrCatRecord[ATTRCAT_REL_NAME_INDEX].sVal,relName);
         strcpy(attrCatRecord[ATTRCAT_ATTR_NAME_INDEX].sVal,attrs[i]);
-        attrCatRecord[ATTRCAT_ATTR_TYPE_INDEX].nVal = attrtype[i];
+        attrCatRecord[ATTRCAT_ATTR_TYPE_INDEX].nVal = (int)attrtype[i];
         attrCatRecord[ATTRCAT_PRIMARY_FLAG_INDEX].nVal = -1;
         attrCatRecord[ATTRCAT_ROOT_BLOCK_INDEX].nVal = -1;
         attrCatRecord[ATTRCAT_OFFSET_INDEX].nVal = i;

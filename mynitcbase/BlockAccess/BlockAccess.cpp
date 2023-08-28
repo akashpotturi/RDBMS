@@ -624,7 +624,7 @@ int BlockAccess::deleteRelation(char relName[ATTR_SIZE]) {
     /*** Delete the entry corresponding to the relation from relation catalog ***/
     // Fetch the header of Relcat block
     HeadInfo relcathead;
-    RecBuffer relcatblk(RELCAT_BLOCK);
+    RecBuffer relcatblk(recId.block);
     relcatblk.getHeader(&relcathead);
     relcathead.numEntries = relcathead.numEntries-1;
     relcatblk.setHeader(&relcathead);
