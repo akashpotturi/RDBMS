@@ -15,6 +15,22 @@ BlockBuffer::BlockBuffer(int blockNum) {
 RecBuffer::RecBuffer(int blockNum) : BlockBuffer::BlockBuffer(blockNum) {}
 RecBuffer::RecBuffer() : BlockBuffer('R'){}
 // call parent non-default constructor with 'R' denoting record block.
+BlockBuffer::BlockBuffer(char blockType){
+    // allocate a block on the disk and a buffer in memory to hold the new block of
+    // given type using getFreeBlock function and get the return error codes if any.
+    if(blockType == 'R')blockType = REC;
+    else blockType = UNUSED_BLK;
+    int alloc_block = getFreeBlock(blockType);
+    this->blockNum = alloc_block;
+
+    // set the blockNum field of the object to that of the allocated block
+    // number if the method returned a valid block number,
+    // otherwise set the error code returned as the block number.
+
+    // (The caller must check if the constructor allocatted block successfully
+    // by checking the value of block number field.)
+}
+
 
 // load the block header into the argument pointer
 int BlockBuffer::getHeader(struct HeadInfo *head) {
@@ -126,8 +142,8 @@ int BlockBuffer::getFreeBlock(int blockType){
     head.numAttrs = 0;
     head.numEntries = 0;
     head.numSlots = 0;
-    this->setHeader(&head);
-    this->setBlockType(blockType);
+    setHeader(&head);
+    setBlockType(blockType);
     return f;
     // initialize the header of the block passing a struct HeadInfo with values
     // pblock: -1, lblock: -1, rblock: -1, numEntries: 0, numAttrs: 0, numSlots: 0
@@ -136,19 +152,6 @@ int BlockBuffer::getFreeBlock(int blockType){
     // update the block type of the block to the input block type using setBlockType().
 
     // return block number of the free block.
-}
-BlockBuffer::BlockBuffer(char blockType){
-    // allocate a block on the disk and a buffer in memory to hold the new block of
-    // given type using getFreeBlock function and get the return error codes if any.
-    int alloc_block = getFreeBlock(blockType);
-    this->blockNum = alloc_block;
-
-    // set the blockNum field of the object to that of the allocated block
-    // number if the method returned a valid block number,
-    // otherwise set the error code returned as the block number.
-
-    // (The caller must check if the constructor allocatted block successfully
-    // by checking the value of block number field.)
 }
 // load the record at slotNum into the argument pointer
 int RecBuffer::getRecord(union Attribute* rec, int slotNum) {
