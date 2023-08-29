@@ -81,7 +81,8 @@ int BlockBuffer::setBlockType(int blockType){
     }
     // store the input block type in the first 4 bytes of the buffer.
     // (hint: cast bufferPtr to int32_t* and then assign it)
-    *((int32_t *)bufferPtr) = blockType;
+    int32_t *blocktypeptr = (int32_t*)bufferPtr;
+    *blocktypeptr = blockType;
 
     // update the StaticBuffer::blockAllocMap entry corresponding to the
     // object's block number to `blockType`.
@@ -126,8 +127,8 @@ int BlockBuffer::getFreeBlock(int blockType){
     head.numAttrs = 0;
     head.numEntries = 0;
     head.numSlots = 0;
-    this->setHeader(&head);
-    this->setBlockType(blockType);
+    setHeader(&head);
+    setBlockType(blockType);
     return f;
     // initialize the header of the block passing a struct HeadInfo with values
     // pblock: -1, lblock: -1, rblock: -1, numEntries: 0, numAttrs: 0, numSlots: 0
@@ -142,7 +143,7 @@ BlockBuffer::BlockBuffer(char blockType){
     // given type using getFreeBlock function and get the return error codes if any.
     int alloc_block = getFreeBlock(blockType);
     this->blockNum = alloc_block;
-
+    // int blockType = blockType
     // set the blockNum field of the object to that of the allocated block
     // number if the method returned a valid block number,
     // otherwise set the error code returned as the block number.
@@ -163,7 +164,7 @@ int RecBuffer::getRecord(union Attribute* rec, int slotNum) {
   struct HeadInfo head;
 
   // get the header using this.getHeader() function
-  this->getHeader(&head);
+  BlockBuffer::getHeader(&head);
 
   int attrCount = head.numAttrs;
   int slotCount = head.numSlots;
@@ -329,6 +330,10 @@ int RecBuffer::setRecord(union Attribute *rec, int slotNum) {
     /* (the above function call should not fail since the block is already
        in buffer and the blockNum is valid. If the call does fail, there
        exists some other issue in the code) */
+    if (ret != SUCCESS) {
+		  std::cout << "There is some error in the code!\n";
+		  exit(1);
+	  }
 
     // return SUCCESS
     return SUCCESS;

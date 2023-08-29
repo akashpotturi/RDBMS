@@ -356,15 +356,15 @@ int BlockAccess::insert(int relId, Attribute *record) {
         // Assign rec_id.block = new block number(i.e. ret) and rec_id.slot = 0
         rec_id.block = ret;
         rec_id.slot = 0;
-        struct HeadInfo head;
-        head.blockType = REC;
-        head.pblock = -1;
-        head.lblock = -1;
-        head.rblock = -1;
-        head.numEntries = 0;
-        head.numSlots = numOfSlots;
-        head.numAttrs = numOfAttributes;
-        block.setHeader(&head);
+        struct HeadInfo header;
+        header.blockType = REC;
+        header.pblock = -1;
+        header.lblock = -1;
+        header.rblock = -1;
+        header.numEntries = 0;
+        header.numSlots = numOfSlots;
+        header.numAttrs = numOfAttributes;
+        block.setHeader(&header);
 
         /*
             set the header of the new record block such that it links with
@@ -379,8 +379,8 @@ int BlockAccess::insert(int relId, Attribute *record) {
             numSlots: numOfSlots, numAttrs: numOfAttributes
             (use BlockBuffer::setHeader() function)
         */
-        unsigned char *slotmap = (unsigned char*)malloc(sizeof(unsigned char)*head.numSlots);
-        for(int i = 0;i<head.numSlots;i++)
+        unsigned char *slotmap = (unsigned char*)malloc(sizeof(unsigned char)*header.numSlots);
+        for(int i = 0;i<header.numSlots;i++)
         {
             slotmap[i] = SLOT_UNOCCUPIED;
         }
@@ -423,18 +423,18 @@ int BlockAccess::insert(int relId, Attribute *record) {
     RecBuffer buffer(rec_id.block);
     buffer.setRecord(record,rec_id.slot);
     // insert the record into rec_id'th slot using RecBuffer.setRecord())
-    unsigned char *slotmap = (unsigned char*)malloc(sizeof(unsigned char)*numOfSlots);
-    buffer.getSlotMap(slotmap);
-    slotmap[rec_id.slot] = SLOT_OCCUPIED;
-    buffer.setSlotMap(slotmap);
+    unsigned char *slotmap2 = (unsigned char*)malloc(sizeof(unsigned char)*numOfSlots);
+    buffer.getSlotMap(slotmap2);
+    slotmap2[rec_id.slot] = SLOT_OCCUPIED;
+    buffer.setSlotMap(slotmap2);
     /* update the slot map of the block by marking entry of the slot to
        which record was inserted as occupied) */
     // (ie store SLOT_OCCUPIED in free_slot'th entry of slot map)
     // (use RecBuffer::getSlotMap() and RecBuffer::setSlotMap() functions)
-    struct HeadInfo header;
-    buffer.getHeader(&header);
-    header.numEntries = header.numEntries + 1;
-    buffer.setHeader(&header);
+    struct HeadInfo header1;
+    buffer.getHeader(&header1);
+    header1.numEntries = header1.numEntries + 1;
+    buffer.setHeader(&header1);
     // increment the numEntries field in the header of the block to
     // which record was inserted
     // (use BlockBuffer::getHeader() and BlockBuffer::setHeader() functions)
