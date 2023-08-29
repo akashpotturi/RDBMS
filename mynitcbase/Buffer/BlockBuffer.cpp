@@ -141,6 +141,8 @@ int BlockBuffer::getFreeBlock(int blockType){
 BlockBuffer::BlockBuffer(char blockType){
     // allocate a block on the disk and a buffer in memory to hold the new block of
     // given type using getFreeBlock function and get the return error codes if any.
+    if(blockType == 'R')blockType = REC;
+    else blockType = UNUSED_BLK;
     int alloc_block = getFreeBlock(blockType);
     this->blockNum = alloc_block;
     // int blockType = blockType
