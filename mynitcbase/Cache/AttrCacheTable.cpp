@@ -74,3 +74,20 @@ int AttrCacheTable::getAttrCatEntry(int relId, char attrName[ATTR_SIZE], AttrCat
   // no attribute with name attrName for the relation
   return E_ATTRNOTEXIST;
 }
+int AttrCacheTable::getAttributeOffset(int relId, char attrName[ATTR_SIZE]) {
+    if (relId < 0 || relId >= MAX_OPEN) return E_RELNOTOPEN;
+
+    AttrCacheEntry *current = AttrCacheTable::attrCache[relId];
+    int attrOffset = 0;
+
+    while (current) {
+        if (strcmp (attrName, current->attrCatEntry.attrName) == 0)
+        {
+            return attrOffset;
+        }
+        current = current->next;
+        attrOffset++;
+    }
+
+    return E_ATTRNOTEXIST;
+}
