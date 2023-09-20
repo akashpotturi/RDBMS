@@ -89,7 +89,7 @@ int Schema::createRel(char relName[],int nAttrs, char attrs[][ATTR_SIZE],int att
     // declare variable relNameAsAttribute of type Attribute
     // copy the relName into relNameAsAttribute.sVal
     Attribute relNameAsAttribute;
-    strcpy(relNameAsAttribute.sVal,relName);
+    strcpy((char*)relNameAsAttribute.sVal,(const char*)relName);
 
     // declare a variable targetRelId of type RecId
     RecId targetRelId;
@@ -107,7 +107,7 @@ int Schema::createRel(char relName[],int nAttrs, char attrs[][ATTR_SIZE],int att
     //                                                     not return {-1,-1} )
     //     return E_RELEXIST;
     if(targetRelId.block != -1 && targetRelId.slot != -1)return E_RELEXIST;
-    for(int i = 0;i<nAttrs;i++)
+    for(int i = 0;i<nAttrs-1;i++)
     {
       for(int j = i+1;j<nAttrs;j++)
       {
@@ -135,7 +135,7 @@ int Schema::createRel(char relName[],int nAttrs, char attrs[][ATTR_SIZE],int att
     relCatRecord[RELCAT_NO_RECORDS_INDEX].nVal = 0;
     relCatRecord[RELCAT_FIRST_BLOCK_INDEX].nVal = -1;
     relCatRecord[RELCAT_LAST_BLOCK_INDEX].nVal = -1;
-    relCatRecord[RELCAT_NO_SLOTS_PER_BLOCK_INDEX].nVal = (2016/(16*nAttrs + 1));
+    relCatRecord[RELCAT_NO_SLOTS_PER_BLOCK_INDEX].nVal = floor((2016*1.00) / (16*nAttrs + 1));
     int retVal = BlockAccess::insert(RELCAT_RELID,relCatRecord);
     if(retVal != SUCCESS)return retVal;
 
@@ -152,7 +152,7 @@ int Schema::createRel(char relName[],int nAttrs, char attrs[][ATTR_SIZE],int att
         // fill attrCatRecord fields as given below
         strcpy(attrCatRecord[ATTRCAT_REL_NAME_INDEX].sVal,relName);
         strcpy(attrCatRecord[ATTRCAT_ATTR_NAME_INDEX].sVal,attrs[i]);
-        attrCatRecord[ATTRCAT_ATTR_TYPE_INDEX].nVal = (int)attrtype[i];
+        attrCatRecord[ATTRCAT_ATTR_TYPE_INDEX].nVal = attrtype[i];
         attrCatRecord[ATTRCAT_PRIMARY_FLAG_INDEX].nVal = -1;
         attrCatRecord[ATTRCAT_ROOT_BLOCK_INDEX].nVal = -1;
         attrCatRecord[ATTRCAT_OFFSET_INDEX].nVal = i;
@@ -166,7 +166,7 @@ int Schema::createRel(char relName[],int nAttrs, char attrs[][ATTR_SIZE],int att
         // retVal = BlockAccess::insert(ATTRCAT_RELID(=1), attrCatRecord);
         if(reVal != SUCCESS)
         {
-          deleteRel(relName);
+          Schema::deleteRel(relName);
           return E_DISKFULL;
         }
         /* if attribute catalog insert fails:
@@ -196,7 +196,7 @@ int Schema::deleteRel(char *relName) {
     // get the rel-id using appropriate method of OpenRelTable class by
     // passing relation name as argument
     int ret = OpenRelTable::getRelId(relName);
-    if(ret != E_RELNOTOPEN)return E_RELOPEN;
+    if(ret<0 || ret>=MAX_OPEN)return E_RELOPEN;
     // if relation is opened in open relation table, return E_RELOPEN
     return BlockAccess::deleteRelation(relName);
     // Call BlockAccess::deleteRelation() with appropriate argument.

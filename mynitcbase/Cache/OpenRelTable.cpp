@@ -290,7 +290,8 @@ OpenRelTable::~OpenRelTable() {
         /* Get the Relation Catalog entry from RelCacheTable::relCache
         Then convert it to a record using RelCacheTable::relCatEntryToRecord(). */
         RecId recId =   RelCacheTable::relCache[ATTRCAT_RELID]->recId;
-        RelCatEntry relcatentry = RelCacheTable::relCache[ATTRCAT_RELID]->relCatEntry;
+        RelCatEntry relcatentry;
+        RelCacheTable::getRelCatEntry(ATTRCAT_RELID,&relcatentry);
         Attribute record[6];
         RelCacheTable::relCatEntryToRecord(&relcatentry,record);
         // declaring an object of RecBuffer class to write back to the buffer
@@ -310,7 +311,8 @@ OpenRelTable::~OpenRelTable() {
         /* Get the Relation Catalog entry from RelCacheTable::relCache
         Then convert it to a record using RelCacheTable::relCatEntryToRecord(). */
         RecId recId = RelCacheTable::relCache[RELCAT_RELID]->recId;
-        RelCatEntry relcatentry  = RelCacheTable::relCache[RELCAT_RELID]->relCatEntry;
+        RelCatEntry relcatentry;
+        RelCacheTable::getRelCatEntry(RELCAT_RELID,&relcatentry);
         Attribute record[6];
         RelCacheTable::relCatEntryToRecord(&relcatentry,record);
         // declaring an object of RecBuffer class to write back to the buffer
@@ -326,6 +328,33 @@ OpenRelTable::~OpenRelTable() {
 
     // free the memory allocated for the attribute cache entries of the
     // relation catalog and the attribute catalog
-    free(AttrCacheTable::attrCache[0]);
-    free(AttrCacheTable::attrCache[1]);
+    for (int relId = ATTRCAT_RELID; relId >= RELCAT_RELID; relId--)
+	  {
+      AttrCacheEntry *curr = AttrCacheTable::attrCache[relId], *next = nullptr;
+      for (int attrIndex = 0; attrIndex < 6; attrIndex++)
+      {
+        next = curr->next;
+
+        // check if the AttrCatEntry was written back
+        if (curr->dirty)
+        {
+          AttrCatEntry attrCatBuffer;
+          AttrCacheTable::getAttrCatEntry(relId, attrIndex, &attrCatBuffer);
+
+          Attribute attrCatRecord [ATTRCAT_NO_ATTRS];
+          AttrCacheTable::attrCatEntryToRecord(&attrCatBuffer, attrCatRecord);
+
+          RecId recId = curr->recId;
+
+          // declaring an object if RecBuffer class to write back to the buffer
+          RecBuffer attrCatBlock (recId.block);
+
+          // write back to the buffer using RecBufer.setRecord()
+          attrCatBlock.setRecord(attrCatRecord, recId.slot);
+        }
+
+        free (curr);
+        curr = next;
+		}
+	}
 }
