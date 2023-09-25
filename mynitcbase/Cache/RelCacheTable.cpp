@@ -124,4 +124,3 @@ int RelCacheTable::resetSearchIndex(int relId) {
   n.slot = -1;
   return RelCacheTable::setSearchIndex(relId,&n);
 }
-

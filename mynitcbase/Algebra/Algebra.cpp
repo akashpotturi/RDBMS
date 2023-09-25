@@ -258,7 +258,7 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
         fill the attr_names, attr_types arrays that we declared with the entries
         of corresponding attributes
     */
-    ret = Schema::createRel(srcRel,src_nAttrs,attr_names,attr_types);
+    ret = Schema::createRel(targetRel,src_nAttrs,attr_names,attr_types);
     if(ret != SUCCESS)return ret;
     /* Create the relation for target relation by calling Schema::createRel()
        by providing appropriate arguments */
@@ -318,7 +318,7 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
     // return SUCCESS.
 }
 int Algebra::project(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE]) {
-
+//clones relation
     int srcRelId = OpenRelTable::getRelId(srcRel);/*srcRel's rel-id (use OpenRelTable::getRelId() function)*/
     if(srcRelId<0 || srcRelId>=MAX_OPEN)return E_RELNOTOPEN;
     // if srcRel is not open in open relation table, return E_RELNOTOPEN

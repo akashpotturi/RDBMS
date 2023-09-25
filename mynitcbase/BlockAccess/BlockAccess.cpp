@@ -465,7 +465,7 @@ int BlockAccess::search(int relId, Attribute *record, char attrName[ATTR_SIZE], 
     // if there's no record satisfying the given condition (recId = {-1, -1})
     //    return E_NOTFOUND;
     RecBuffer rec(recId.block);
-    rec.setRecord(record,recId.slot);
+    rec.getRecord(record,recId.slot);
     /* Copy the record with record id (recId) to the record buffer (record)
        For this Instantiate a RecBuffer class object using recId and
        call the appropriate method to fetch the record
