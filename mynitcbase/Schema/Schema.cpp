@@ -194,9 +194,9 @@ int Schema::deleteRel(char *relName) {
         // you may use the following constants: RELCAT_NAME and ATTRCAT_NAME)
 
     // get the rel-id using appropriate method of OpenRelTable class by
-    // passing relation name as argument
+    // passing relation name as argument.
     int ret = OpenRelTable::getRelId(relName);
-    if(ret<0 || ret>=MAX_OPEN)return E_RELOPEN;
+    if(ret != E_RELNOTOPEN)return E_RELOPEN;
     // if relation is opened in open relation table, return E_RELOPEN
     return BlockAccess::deleteRelation(relName);
     // Call BlockAccess::deleteRelation() with appropriate argument.
