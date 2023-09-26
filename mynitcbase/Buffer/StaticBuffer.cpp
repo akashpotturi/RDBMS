@@ -129,3 +129,11 @@ StaticBuffer::~StaticBuffer() {
 			Disk::writeBlock(blocks[bufferIndex], metainfo[bufferIndex].blockNum);
 	}
 }
+int StaticBuffer::getStaticBlockType(int blockNum){
+    // Check if blockNum is valid (non zero and less than number of disk blocks)
+    // and return E_OUTOFBOUND if not valid.
+	if(blockNum<0 || blockNum>=DISK_BLOCKS)return E_OUTOFBOUND;
+    // Access the entry in block allocation map corresponding to the blockNum argument
+    // and return the block type after type casting to integer.
+	return (int)blockAllocMap[blockNum];
+}
