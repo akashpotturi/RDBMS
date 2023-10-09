@@ -194,3 +194,70 @@ int AttrCacheTable::getSearchIndex(int relId,char attrName[ATTR_SIZE], IndexId *
 
   return E_ATTRNOTEXIST;
 }
+int AttrCacheTable::setAttrCatEntry(int relId, char attrName[ATTR_SIZE], AttrCatEntry *attrCatBuf) {
+
+  if(/*relId is outside the range [0, MAX_OPEN-1]*/relId<0||relId>=MAX_OPEN) {
+    return E_OUTOFBOUND;
+  }
+
+  if(/*entry corresponding to the relId in the Attribute Cache Table is free*/attrCache[relId]==nullptr) {
+    return E_RELNOTOPEN;
+  }
+
+  for(/* each attribute corresponding to relation with relId */AttrCacheEntry* entry = attrCache[relId]; entry != nullptr; entry = entry->next)
+  {
+    if(/* the attrName/offset field of the AttrCatEntry
+       is equal to the input attrName/attrOffset */!strcmp(entry->attrCatEntry.attrName,attrName))
+    {
+      // copy the attrCatBuf to the corresponding Attribute Catalog entry in
+      // the Attribute Cache Table.
+
+      // set the dirty flag of the corresponding Attribute Cache entry in the
+      // Attribute Cache Table.
+      strcpy(entry->attrCatEntry.attrName,attrName);
+      entry->attrCatEntry.attrType = attrCatBuf->attrType;
+      entry->attrCatEntry.offset = attrCatBuf->offset;
+      entry->attrCatEntry.primaryFlag = attrCatBuf->primaryFlag;
+      strcpy(entry->attrCatEntry.relName,attrCatBuf->relName);
+      entry->attrCatEntry.rootBlock = attrCatBuf->rootBlock;
+      entry->dirty = true;
+      return SUCCESS;
+    }
+  }
+
+  return E_ATTRNOTEXIST;
+}
+int AttrCacheTable::setAttrCatEntry(int relId,int attrOffset, AttrCatEntry *attrCatBuf) {
+
+  if(/*relId is outside the range [0, MAX_OPEN-1]*/relId<0||relId>=MAX_OPEN) {
+    return E_OUTOFBOUND;
+  }
+
+  if(/*entry corresponding to the relId in the Attribute Cache Table is free*/attrCache[relId]==nullptr) {
+    return E_RELNOTOPEN;
+  }
+
+  for(/* each attribute corresponding to relation with relId */AttrCacheEntry* entry = attrCache[relId]; entry != nullptr; entry = entry->next)
+  {
+    if(/* the attrName/offset field of the AttrCatEntry
+       is equal to the input attrName/attrOffset */entry->attrCatEntry.offset == attrOffset)
+    {
+      // copy the attrCatBuf to the corresponding Attribute Catalog entry in
+      // the Attribute Cache Table.
+
+      // set the dirty flag of the corresponding Attribute Cache entry in the
+      // Attribute Cache Table.
+      strcpy(entry->attrCatEntry.attrName,attrCatBuf->attrName);
+      entry->attrCatEntry.attrType = attrCatBuf->attrType;
+      entry->attrCatEntry.offset = attrCatBuf->offset;
+      entry->attrCatEntry.primaryFlag = attrCatBuf->primaryFlag;
+      strcpy(entry->attrCatEntry.relName,attrCatBuf->relName);
+      entry->attrCatEntry.rootBlock = attrCatBuf->rootBlock;
+      entry->dirty = true;
+
+      return SUCCESS;
+    }
+  }
+
+  return E_ATTRNOTEXIST;
+}
