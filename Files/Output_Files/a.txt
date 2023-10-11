@@ -1,0 +1,17 @@
+----- B+ TREE BLOCKS -----
+BLOCK 296
+Block Type: IND_LEAF
+Parent Block: -1
+No of entries: 10
+left node: -1, right node: -1
+key_val: 1.00
+key_val: 2.00
+key_val: 3.00
+key_val: 4.00
+key_val: 5.00
+key_val: 6.00
+key_val: 7.00
+key_val: 8.00
+key_val: 9.00
+key_val: 10.00
+---------
