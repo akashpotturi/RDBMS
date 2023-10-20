@@ -163,7 +163,7 @@ int AttrCacheTable::getSearchIndex(int relId,int attrOffset, IndexId *searchInde
     {
       //copy the searchIndex field of the corresponding Attribute Cache entry
       //in the Attribute Cache Table to input searchIndex variable.
-      *searchIndex = attrCache[relId]->searchIndex;
+      *searchIndex = entry->searchIndex;
       return SUCCESS;
     }
   }
@@ -187,7 +187,7 @@ int AttrCacheTable::getSearchIndex(int relId,char attrName[ATTR_SIZE], IndexId *
     {
       //copy the searchIndex field of the corresponding Attribute Cache entry
       //in the Attribute Cache Table to input searchIndex variable.
-      *searchIndex = attrCache[relId]->searchIndex;
+      *searchIndex = entry->searchIndex;
       return SUCCESS;
     }
   }
