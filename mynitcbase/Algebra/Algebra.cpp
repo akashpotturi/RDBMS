@@ -683,7 +683,5 @@ int Algebra::join(char srcRelation1[ATTR_SIZE], char srcRelation2[ATTR_SIZE], ch
             }
         }
     }
-    OpenRelTable::closeRel(targetRelId);
-    // close the target relation by calling OpenRelTable::closeRel()
     return SUCCESS;
 }
